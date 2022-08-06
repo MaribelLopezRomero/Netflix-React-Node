@@ -11,10 +11,11 @@ import SignUp from "./SignUp";
 import apiMovies from "../services/api-movies";
 import apiUser from "../services/api-user";
 import router from "../services/router";
+import ls from "../services/local-storage";
 
 const App = () => {
   // state: user
-  const [userId, setUserId] = useState("");
+  const [userId, setUserId] = useState(ls.get("userId", ""));
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
@@ -56,6 +57,16 @@ const App = () => {
         setUserPassword(response.password);
       });
     }
+  }, [userId]);
+
+  /*
+  useEffect: mantener la sesion iniciada.
+  Se ejecuta cuando userId cambian de valor, es decir, cuando pasa en este caso de un string con el id a vacio porque refrescamos la pagina o salimos de ella.
+  */
+
+  useEffect(() => {
+    // Guardamos el id en el local storage
+    ls.set("userId", userId);
   }, [userId]);
 
   /*
