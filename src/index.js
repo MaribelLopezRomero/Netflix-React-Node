@@ -1,7 +1,8 @@
 const dataMovies = require("./data/movies.json");
+const dataUsers = require("./data/users.json");
+
 const express = require("express");
 const cors = require("cors");
-const { off } = require("process");
 
 // create and config server
 const app = express();
@@ -40,4 +41,25 @@ app.get("/movies", (req, res) => {
     success: true,
     movies,
   });
+});
+
+app.post("/login", (req, res) => {
+  const user = dataUsers.find((user) => {
+    return user.email === req.body.email && user.password == req.body.password;
+  });
+  //Respuesta
+  let response = {};
+
+  if (user === undefined) {
+    response = {
+      success: false,
+      errorMessage: "Usuaria/o no encontrada/o",
+    };
+  } else {
+    response = {
+      success: true,
+      userId: user.id,
+    };
+  }
+  res.json(response);
 });
