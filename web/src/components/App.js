@@ -15,7 +15,7 @@ import ls from "../services/local-storage";
 
 const App = () => {
   // state: user
-  const [userId, setUserId] = useState(ls.get("userId", ""));
+  const [userId, setUserId] = useState(ls.get("userId", "") || "");
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
@@ -144,10 +144,13 @@ const App = () => {
   /*
   Event: cerrar sesión.
   Redireccionamos al inicio de la página.
+  Limpiamos el local storage
   Recargamos la página para que se borren todos los datos del estado de React.
+
   */
   const logout = () => {
     router.redirect("/");
+    localStorage.clear();
     router.reload();
   };
 

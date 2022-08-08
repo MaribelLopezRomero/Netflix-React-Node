@@ -1,8 +1,12 @@
-const dataMovies = require("./data/movies.json");
-const dataUsers = require("./data/users.json");
+// const dataMovies = require("./data/movies.json");
+// const dataUsers = require("./data/users.json");
 
 const express = require("express");
 const cors = require("cors");
+
+//BBDD
+
+const Database = require("better-sqlite3");
 
 // create and config server
 const app = express();
@@ -23,19 +27,30 @@ app.use(express.static(staticServerPath));
 const staticServerImagesPath = "./src/public-movies-images";
 app.use(express.static(staticServerImagesPath));
 
+//BBDD
+
+const db = new Database("./src/DB/database.db", {
+  verbose: console.log, //muestra por consola todas las consultas que ejecutamos
+});
+
 //end-point get /movies
 
 app.get("/movies", (req, res) => {
-  const movies = dataMovies
-    .filter((movie) => {
-      return movie.gender.includes(req.query.gender);
-    })
-    .sort((a, b) => {
-      if (req.query.sort === "desc") {
-        return a.title.localeCompare(b.title) * -1;
-      }
-      return a.title.localeCompare(b.title);
-    });
+  //Preparamos la query
+  const query = db.prepare(
+    `SELECT * FROM movies WHERE gender= ? ORDER BY title ${req.query.sort}`
+  );
+  const queryAll = db.prepare(
+    `SELECT * FROM movies ORDER BY title ${req.query.sort}`
+  );
+
+  console.log(req.query.gender);
+  let movies = [];
+  if (req.query.gender === "") {
+    movies = queryAll.all();
+  } else {
+    movies = query.all(req.query.gender);
+  }
 
   res.json({
     success: true,
@@ -44,9 +59,15 @@ app.get("/movies", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const user = dataUsers.find((user) => {
-    return user.email === req.body.email && user.password == req.body.password;
-  });
+  //Preparamos la base de query
+  const query = db.prepare(
+    "SELECT * FROM users where email = ? AND password = ?"
+  );
+  //Ejecutamos la select
+  const user = query.get(req.body.email, req.body.password);
+
+  console.log(user);
+
   //Respuesta
   let response = {};
 
