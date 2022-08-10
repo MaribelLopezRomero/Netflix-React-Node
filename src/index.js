@@ -84,3 +84,64 @@ app.post("/login", (req, res) => {
   }
   res.json(response);
 });
+
+app.post("/sing-up", (req, res) => {
+  //preparamos la query
+  const query = db.prepare("INSERT INTO users (email , password) VALUES (?,?)");
+
+  //Comprobamos que no est aregistrada
+
+  const queryComprobar = db.prepare("SELECT * from users where email = ?");
+
+  const resultComprobar = queryComprobar.get(req.body.email);
+
+  let response = {};
+
+  if (resultComprobar === undefined) {
+    //Ejecutamos la query
+    const result = query.run(req.body.email, req.body.password);
+    response = {
+      success: true,
+      userId: result.lastInsertRowid,
+    };
+  } else {
+    response = {
+      errorMessage: "Usuaria ya registrada",
+    };
+  }
+
+  res.json(response);
+});
+
+app.post("/user/profile", (req, res) => {
+  console.log(req.body);
+  console.log(req.header("user-id"));
+
+  //preparamos la query
+  const query = db.prepare(
+    "UPDATE users SET email = ?, password= ? WHERE id = ? "
+  );
+
+  //ejecutamos la query
+
+  const result = query.run(
+    req.body.email,
+    req.body.password,
+    req.header("user-id")
+  );
+  res.json({
+    success: true,
+    result,
+  });
+});
+
+app.get("/user/profile", (req, res) => {
+  //preparamos la query
+  const query = db.prepare("SELECT * FROM users where id = ?");
+  //Ejecutamos la consulta
+  const result = query.get(req.header("user-id"));
+  res.json({
+    success: true,
+    result,
+  });
+});
