@@ -3,6 +3,7 @@
 
 const express = require("express");
 const cors = require("cors");
+require("dotenv").config();
 
 //BBDD
 
@@ -14,7 +15,8 @@ app.use(cors());
 app.use(express.json());
 
 // init express aplication
-const serverPort = 4000;
+const serverPort = process.env.PORT || 4000;
+console.log("puerto", serverPort);
 app.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
@@ -143,5 +145,20 @@ app.get("/user/profile", (req, res) => {
   res.json({
     success: true,
     result,
+  });
+});
+
+app.get("/user/movies", (req, res) => {
+  //preparamos la query
+  const query = db.prepare(
+    "select * from favorites f, movies m where m.id = f.idMovie and f.idUser = ?"
+  );
+
+  //Ejecutamos la query
+  const result = query.all(req.header("user-id"));
+
+  res.json({
+    succes: true,
+    movies: result,
   });
 });

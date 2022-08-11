@@ -1,9 +1,15 @@
+//Despliegue en produccion
+const serverUrl =
+  process.env.NODE_ENV === "production"
+    ? "netflix-react-node.herokuapp.com/"
+    : "http://localhost:4000";
+
 // login
 
 const sendLoginToApi = (data) => {
   //data son los bodyparams
   console.log("Se están enviando datos al login:", data);
-  return fetch("//localhost:4000/login", {
+  return fetch(`${serverUrl}/login`, {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
@@ -20,7 +26,7 @@ const sendLoginToApi = (data) => {
 
 const sendSingUpToApi = (data) => {
   console.log("Se están enviando datos al signup:", data);
-  return fetch("//localhost:4000/sing-up", {
+  return fetch(`${serverUrl}/sing-up`, {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
@@ -37,7 +43,7 @@ const sendSingUpToApi = (data) => {
 
 const sendProfileToApi = (userId, data) => {
   console.log("Se están enviando datos al profile:", userId, data);
-  return fetch("//localhost:4000/user/profile", {
+  return fetch(`${serverUrl}/user/profile`, {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
@@ -49,7 +55,7 @@ const sendProfileToApi = (userId, data) => {
 
 const getProfileFromApi = (userId) => {
   console.log("Se están pidiendo datos del profile del usuario:", userId);
-  return fetch("//localhost:4000/user/profile", {
+  return fetch(`${serverUrl}/user/profile`, {
     method: "GET",
     headers: {
       "user-id": userId,
@@ -69,25 +75,16 @@ const getUserMoviesFromApi = (userId) => {
     "Se están pidiendo datos de las películas de la usuaria:",
     userId
   );
-  // CAMBIA ESTE FETCH PARA QUE APUNTE A UN ENDPOINT DE TU SERVIDOR, PIENSA SI DEBE SER GET O POST, PIENSA QUÉ DATOS DEBES ENVIAR, ETC
-  return fetch(
-    "//beta.adalab.es/curso-intensivo-fullstack-recursos/apis/netflix-v1/empty.json"
-  )
+  return fetch(`${serverUrl}/user/movies`, {
+    method: "GET",
+    headers: {
+      "user-id": userId,
+      "Content-Type": "application/json",
+    },
+  })
     .then((response) => response.json())
-    .then(() => {
-      // CAMBIA EL CONTENIDO DE ESTE THEN PARA GESTIONAR LA RESPUESTA DEL SERVIDOR Y RETORNAR AL COMPONENTE APP LO QUE NECESITA
-      return {
-        success: true,
-        movies: [
-          {
-            id: 1,
-            title: "Gambita de dama",
-            gender: "Drama",
-            image:
-              "//beta.adalab.es/curso-intensivo-fullstack-recursos/apis/netflix-v1/images/gambito-de-dama.jpg",
-          },
-        ],
-      };
+    .then((data) => {
+      return data;
     });
 };
 
