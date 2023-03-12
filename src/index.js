@@ -31,7 +31,7 @@ app.use(express.static(staticServerImagesPath));
 
 //BBDD
 
-const db = new Database("./src/DB/database.db", {
+const db = new Database("./DB/database.db", {
   verbose: console.log, //muestra por consola todas las consultas que ejecutamos
 });
 
